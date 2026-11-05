@@ -1,0 +1,36 @@
+SISTEMA DE ROMANEIO AMAZON — EDITORA MIZUNO
+
+1. Dê dois cliques em "Abrir-Romaneio.bat".
+2. Selecione o CSV exportado da Amazon.
+3. Na guia "Romaneio", baixe a Via da Editora e a Via do Motorista.
+4. Na guia "Lista de separação", confira os SKUs já somados e, se quiser,
+   baixe o PDF para o responsável separar os livros.
+5. Na guia "Histórico", veja todos os pedidos já carregados. É possível
+   excluir uma linha incluída por engano e copiar todos os Order IDs em uma
+   única linha, separados por vírgula.
+6. Imprima os PDFs e assine no momento da retirada.
+
+O sistema funciona localmente no navegador e não envia os pedidos para a internet.
+Depois de cada CSV carregado, o sistema pergunta se deseja salvar o lote.
+Quando salvo, ele entra em um pacote do dia no Diário de pedidos. Clique no
+pacote para abrir os livros e pedidos daquele lote, separado dos demais dias.
+O histórico fica salvo neste computador e neste navegador.
+
+BANCO DE DADOS E CONSULTA PELA EQUIPE
+
+Agora o histórico fica salvo no banco de dados do sistema (data\romaneio.db).
+Abra sempre pelo "Abrir-Romaneio.bat". Com o sistema aberto, a própria tela
+mostrará o endereço da rede para outras pessoas consultarem pelo navegador,
+desde que estejam na mesma rede e este computador esteja ligado.
+
+Na lista de separação também há a Lista de conferência e Etiquetas A6:
+quatro pedidos por folha A4, com o rastreio em destaque no topo.
+
+Campos usados do CSV:
+- Pedido: Order ID
+- SKU: SKU
+- ASIN: ASIN
+- Produto: Item Title
+- Quantidade: Item Quantity
+- Rastreio: Tracking ID
+- Transportadora: Ship Method

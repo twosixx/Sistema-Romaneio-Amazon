@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Romaneio Amazon — Editora Mizuno</title>
+  <style>
+    :root { color-scheme: light; --ink:#18212f; --muted:#64748b; --line:#dbe3ee; --accent:#0e7490; --accent-dark:#155e75; --paper:#fff; --bg:#f3f7fa; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; font:16px/1.5 Inter,Segoe UI,Arial,sans-serif; color:var(--ink); background:var(--bg); }
+    main { width:min(1120px, calc(100% - 32px)); margin:42px auto; }
+    .card { background:var(--paper); border:1px solid var(--line); border-radius:18px; padding:34px; box-shadow:0 14px 34px rgba(15,23,42,.07); }
+    .eyebrow { margin:0 0 10px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.08em; font-size:.76rem; }
+    h1 { margin:0; font-size:clamp(1.7rem, 4vw, 2.45rem); line-height:1.15; }
+    .title-row { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    .date-control { display:flex; align-items:center; gap:8px; padding:8px 10px 8px 13px; border:1px solid var(--line); border-radius:12px; background:#f8fafc; }
+    .date-control label { display:grid; gap:2px; color:var(--muted); font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+    .date-control input { border:0; background:transparent; color:var(--ink); font:600 .94rem Inter,Segoe UI,Arial,sans-serif; outline:0; }
+    button.today { padding:8px 12px; font-size:.86rem; }
+    .lead { margin:13px 0 28px; color:var(--muted); max-width:660px; }
+    .drop { display:block; padding:30px; border:2px dashed #94a3b8; border-radius:13px; text-align:center; cursor:pointer; background:#f8fafc; transition:.16s ease; }
+    .drop:hover,.drop.drag { border-color:var(--accent); background:#ecfeff; }
+    .drop strong { display:block; font-size:1.08rem; }
+    .drop span { color:var(--muted); font-size:.9rem; }
+    input[type=file] { display:none; }
+    #info { margin:20px 0 0; padding:14px 16px; border-radius:10px; background:#f8fafc; color:var(--muted); display:none; }
+    #info.ok { display:block; color:#166534; background:#f0fdf4; }
+    #info.error { display:block; color:#991b1b; background:#fef2f2; }
+    .actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:24px; }
+    button { border:0; border-radius:10px; padding:13px 18px; font:inherit; font-weight:700; cursor:pointer; color:#fff; background:var(--accent); }
+    button:hover:not(:disabled) { background:var(--accent-dark); }
+    button:disabled { cursor:not-allowed; opacity:.45; }
+    .secondary { background:#334155; }
+    .secondary:hover:not(:disabled) { background:#1e293b; }
+    .tabs { display:flex; gap:5px; margin:30px 0 24px; padding:5px; background:#eef3f7; border-radius:12px; }
+    button.tab { flex:1; color:#475569; background:transparent; padding:11px 14px; }
+    button.tab:hover { color:var(--ink); background:#fff; }
+    button.tab.active { color:var(--accent-dark); background:#fff; box-shadow:0 1px 4px rgba(15,23,42,.12); }
+    .tab-panel[hidden] { display:none; }
+    .panel-heading { display:flex; justify-content:space-between; align-items:end; gap:20px; margin-bottom:16px; }
+    .panel-heading h2 { margin:0; font-size:1.35rem; }
+    .panel-heading p { margin:4px 0 0; color:var(--muted); font-size:.92rem; }
+    .stat { white-space:nowrap; color:var(--accent-dark); background:#ecfeff; padding:7px 10px; border-radius:999px; font-size:.84rem; font-weight:700; }
+    .table-wrap { overflow:auto; border:1px solid var(--line); border-radius:11px; }
+    table { width:100%; min-width:760px; border-collapse:collapse; font-size:.88rem; }
+    th { background:#edf7fa; color:#123040; text-align:left; font-size:.78rem; letter-spacing:.02em; }
+    th, td { padding:10px 11px; border-bottom:1px solid var(--line); vertical-align:top; }
+    tr:last-child td { border-bottom:0; }
+    td.qty { text-align:center; font-weight:700; }
+    .empty { margin:0; padding:28px; border:1px dashed #cbd5e1; border-radius:11px; color:var(--muted); text-align:center; }
+    button.danger { color:#b91c1c; background:#fff; border:1px solid #fecaca; padding:7px 10px; font-size:.8rem; }
+    button.danger:hover { color:#fff; background:#b91c1c; }
+    #historyMessage { min-height:1.5em; margin:12px 0 0; color:#166534; font-size:.9rem; }
+    .diary-entry { margin:12px 0; border:1px solid var(--line); border-radius:12px; background:#fff; overflow:hidden; }
+    .diary-entry summary { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:16px 18px; cursor:pointer; list-style:none; }
+    .diary-entry summary::-webkit-details-marker { display:none; }
+    .diary-entry summary::after { content:'›'; font-size:1.5rem; line-height:1; color:var(--accent); transform:rotate(0deg); transition:transform .15s ease; }
+    .diary-entry[open] summary { border-bottom:1px solid var(--line); background:#f8fafc; }
+    .diary-entry[open] summary::after { transform:rotate(90deg); }
+    .diary-title { display:block; font-weight:800; }
+    .diary-subtitle { display:block; margin-top:2px; color:var(--muted); font-size:.86rem; }
+    .diary-body { padding:15px 18px 18px; }
+    .diary-actions { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+    button.copy-day { padding:8px 11px; color:#075985; background:#e0f2fe; font-size:.8rem; }
+    button.copy-day:hover { background:#bae6fd; }
+    .modal[hidden] { display:none; }
+    .modal { position:fixed; z-index:20; inset:0; display:grid; place-items:center; padding:20px; background:rgba(15,23,42,.5); }
+    .modal-card { width:min(460px, 100%); padding:28px; border-radius:16px; background:#fff; box-shadow:0 24px 54px rgba(15,23,42,.3); }
+    .modal-card h2 { margin:0 0 8px; }
+    .modal-card p { margin:0; color:var(--muted); }
+    .modal-card .actions { margin-top:22px; }
+    .details { margin-top:32px; padding-top:24px; border-top:1px solid var(--line); color:var(--muted); font-size:.92rem; }
+    .details h2 { margin:0 0 8px; color:var(--ink); font-size:1rem; }
+    .details ul { margin:8px 0; padding-left:20px; }
+    .small { font-size:.83rem; }
+    @media (max-width:560px) { main { margin:18px auto; } .card { padding:23px; } .title-row { align-items:start; flex-direction:column; } .actions button { width:100%; } .tabs { overflow:auto; } button.tab { min-width:140px; } .panel-heading { align-items:start; flex-direction:column; gap:7px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="card">
+      <p class="eyebrow">Editora Mizuno · Dropship</p>
+      <div class="title-row"><h1>Gerador de romaneio</h1><div class="date-control"><label>Data para consultar e imprimir<input id="daySelector" type="date"></label><button id="todayButton" class="secondary today" type="button">Hoje</button></div></div>
+      <p class="lead">Selecione o relatório de pedidos da Amazon. O sistema cria duas vias em PDF, prontas para imprimir e assinar no momento da retirada.</p>
+      <label class="drop" id="drop" for="csv">
+        <strong>Escolher arquivo CSV</strong>
+        <span>ou arraste o arquivo para esta área</span>
+      </label>
+      <input id="csv" type="file" accept=".csv,text/csv">
+      <div id="info" role="status"></div>
+      <div id="serverInfo" class="small"></div>
+      <nav class="tabs" aria-label="Seções do sistema">
+        <button class="tab active" data-tab="romaneio" type="button">Romaneio</button>
+        <button class="tab" data-tab="separacao" type="button">Lista de separação</button>
+        <button class="tab" data-tab="historico" type="button">Histórico</button>
+      </nav>
+
+      <section class="tab-panel" id="panel-romaneio">
+        <div class="actions">
+          <button id="editora" disabled>Baixar via da Editora (PDF)</button>
+          <button id="motorista" class="secondary" disabled>Baixar via do Motorista (PDF)</button>
+        </div>
+        <div class="details">
+          <h2>O que aparece no romaneio</h2>
+          <ul>
+            <li>Pedido, SKU, ASIN, produto, quantidade, rastreio e transportadora.</li>
+            <li><strong>Via da Editora:</strong> fica na Editora e é assinada pelo motorista/retirante.</li>
+            <li><strong>Via do Motorista:</strong> fica com o retirante e é assinada pela Editora Mizuno.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="panel-separacao" hidden>
+        <div class="panel-heading">
+          <div><h2>Lista de separação</h2><p>Todos os SKUs do CSV atual, agrupados e somados para separar os livros de uma vez.</p></div>
+          <span class="stat" id="pickingStat">Carregue um CSV</span>
+        </div>
+        <div class="actions"><button id="separacaoPdf" disabled>Baixar lista de separação (PDF)</button><button id="conferenciaPdf" class="secondary" disabled>Baixar lista de conferência (PDF)</button><button id="etiquetasPdf" class="secondary" disabled>Etiquetas A6 (1 por folha)</button></div>
+        <div id="pickingTable"></div>
+      </section>
+
+      <section class="tab-panel" id="panel-historico" hidden>
+        <div class="panel-heading">
+          <div><h2>Diário de pedidos</h2><p>Cada dia salvo vira um pacote. Clique no dia para ver os livros e pedidos daquele lote.</p></div>
+          <span class="stat" id="historyStat">0 pedidos</span>
+        </div>
+        <div class="actions"><button id="copyOrders" disabled>Copiar todos os Order IDs</button></div>
+        <p id="historyMessage" role="status"></p>
+        <div id="historyTable"></div>
+      </section>
+      <p class="small">Os dados são lidos e salvos apenas no seu navegador; nenhum pedido é enviado para a internet.</p>
+    </section>
+  </main>
+  <div class="modal" id="savePrompt" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="savePromptTitle">
+      <p class="eyebrow">Histórico diário</p>
+      <h2 id="savePromptTitle">Salvar este lote?</h2>
+      <p id="savePromptText"></p>
+      <p><label>Data do histórico: <input id="saveDate" type="date"></label></p>
+      <div class="actions">
+        <button id="confirmSave" type="button">Salvar no histórico de hoje</button>
+        <button id="skipSave" class="secondary" type="button">Não salvar agora</button>
+      </div>
+    </div>
+  </div>
+  <script>
+  (() => {
+    'use strict';
+    const input = document.querySelector('#csv');
+    const drop = document.querySelector('#drop');
+    const info = document.querySelector('#info');
+    const serverInfo = document.querySelector('#serverInfo');
+    const buttons = { editora: document.querySelector('#editora'), motorista: document.querySelector('#motorista'), separacao: document.querySelector('#separacaoPdf'), conferencia: document.querySelector('#conferenciaPdf'), etiquetas: document.querySelector('#etiquetasPdf'), copiar: document.querySelector('#copyOrders') };
+    const tabButtons = [...document.querySelectorAll('[data-tab]')];
+    const panels = { romaneio: document.querySelector('#panel-romaneio'), separacao: document.querySelector('#panel-separacao'), historico: document.querySelector('#panel-historico') };
+    const pickingTable = document.querySelector('#pickingTable');
+    const pickingStat = document.querySelector('#pickingStat');
+    const historyTable = document.querySelector('#historyTable');
+    const historyStat = document.querySelector('#historyStat');
+    const historyMessage = document.querySelector('#historyMessage');
+    const daySelector = document.querySelector('#daySelector');
+    const todayButton = document.querySelector('#todayButton');
+    const savePrompt = document.querySelector('#savePrompt');
+    const savePromptText = document.querySelector('#savePromptText');
+    const confirmSave = document.querySelector('#confirmSave');
+    const skipSave = document.querySelector('#skipSave');
+    const saveDate = document.querySelector('#saveDate');
+    let orders = [], sourceName = '', pendingOrders = [], historyCache = [];
+    const required = ['Order ID','SKU','ASIN','Item Title','Item Quantity','Tracking ID','Ship Method'];
+
+    function notice(message, kind) { info.textContent = message; info.className = kind || 'ok'; }
+    function value(row, field) { return String(row[field] ?? '').trim(); }
+    function localDateKey(date = new Date()) { const yyyy=date.getFullYear(), mm=String(date.getMonth()+1).padStart(2,'0'), dd=String(date.getDate()).padStart(2,'0'); return `${yyyy}-${mm}-${dd}`; }
+    function dateLabel(dateKey) { return new Intl.DateTimeFormat('pt-BR', { dateStyle:'full' }).format(new Date(`${dateKey}T12:00:00`)); }
+    function historyDate(row) { return row.historyDate || (row.importedAt ? localDateKey(new Date(row.importedAt)) : localDateKey()); }
+    function quantity(row) { const parsed = Number(value(row, 'Item Quantity').replace(',', '.')); return Number.isFinite(parsed) ? parsed : 0; }
+    function qtyText(number) { return Number.isInteger(number) ? String(number) : new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 }).format(number); }
+    function makeId() { return (globalThis.crypto && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`; }
+    function orderKey(row) { return [value(row, 'Order ID'), value(row, 'SKU'), value(row, 'Tracking ID')].join('|').toLowerCase(); }
+    function readHistory() { return daySelector && daySelector.value ? historyCache.filter(row => historyDate(row) === daySelector.value) : historyCache; }
+    async function loadHistory() { try { const response=await fetch('/api/history'); if (!response.ok) throw new Error(); historyCache=await response.json(); renderHistory(); } catch { historyNotice('Banco de dados indisponível. Abra pelo arquivo Abrir-Romaneio.bat.',true); } }
+    async function showNetworkAddress() { try { const data=await (await fetch('/api/status')).json(); serverInfo.textContent=data.urls.length ? `Consulta pela equipe: ${data.urls[0]}` : 'Banco de dados local ativo.'; } catch { serverInfo.textContent='Abra pelo arquivo Abrir-Romaneio.bat para usar o banco de dados.'; } }
+    function historyNotice(message, error=false) { historyMessage.textContent = message; historyMessage.style.color = error ? '#b91c1c' : '#166534'; }
+    async function addToHistory(rows, day = localDateKey()) { const response=await fetch('/api/history',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:day,source:sourceName,orders:rows})}); if(!response.ok) throw new Error(); const result=await response.json(); await loadHistory(); return result.added; }
+    function cell(text, className='') { const td = document.createElement('td'); td.textContent = text || '—'; if (className) td.className = className; return td; }
+    function renderHistory() {
+      const history = readHistory().sort((a,b) => String(b.importedAt).localeCompare(String(a.importedAt)));
+      const groups = new Map(); history.forEach(row => { const day=historyDate(row); if (!groups.has(day)) groups.set(day,[]); groups.get(day).push(row); });
+      historyStat.textContent = `${history.length} pedido${history.length === 1 ? '' : 's'} · ${groups.size} dia${groups.size === 1 ? '' : 's'}`;
+      buttons.copiar.disabled = history.length === 0;
+      historyTable.replaceChildren();
+      if (!history.length) { const empty=document.createElement('p'); empty.className='empty'; empty.textContent='Nenhum pedido salvo ainda. Carregue um CSV para começar o histórico.'; historyTable.append(empty); return; }
+      [...groups.keys()].sort().reverse().forEach(day => {
+        const dayRows=groups.get(day); const daySkus=new Set(dayRows.map(row => value(row,'SKU'))).size; const dayBooks=dayRows.reduce((sum,row) => sum+quantity(row),0);
+        const section=document.createElement('details'); section.className='diary-entry';
+        const summary=document.createElement('summary'); const summaryText=document.createElement('span'); const title=document.createElement('span'); title.className='diary-title'; title.textContent=`Pacote de ${dateLabel(day)}`;
+        const subtitle=document.createElement('span'); subtitle.className='diary-subtitle'; subtitle.textContent=`${dayRows.length} pedido${dayRows.length===1?'':'s'} · ${daySkus} SKU${daySkus===1?'':'s'} · ${qtyText(dayBooks)} livro${dayBooks===1?'':'s'}`;
+        summaryText.append(title,subtitle); summary.append(summaryText);
+        const body=document.createElement('div'); body.className='diary-body'; const dayActions=document.createElement('div'); dayActions.className='diary-actions';
+        const copy=document.createElement('button'); copy.type='button'; copy.className='copy-day'; copy.dataset.copyDate=day; copy.textContent='Copiar IDs deste dia';
+        const removeDay=document.createElement('button'); removeDay.type='button'; removeDay.className='danger'; removeDay.dataset.removeDay=day; removeDay.textContent='Excluir este dia'; dayActions.append(copy,removeDay); body.append(dayActions);
+        const wrap=document.createElement('div'); wrap.className='table-wrap'; const table=document.createElement('table');
+        const headers=['Order ID','SKU','ASIN','Produto','Qtd.','Rastreio','Transportadora','Incluído em',''];
+        const thead=document.createElement('thead'), headerRow=document.createElement('tr'); headers.forEach(label => { const th=document.createElement('th'); th.textContent=label; headerRow.append(th); }); thead.append(headerRow);
+        const tbody=document.createElement('tbody');
+        dayRows.forEach(row => {
+          const tr=document.createElement('tr');
+          tr.append(cell(value(row,'Order ID')), cell(value(row,'SKU')), cell(value(row,'ASIN')), cell(value(row,'Item Title')), cell(value(row,'Item Quantity'),'qty'), cell(value(row,'Tracking ID')), cell(value(row,'Ship Method')));
+          tr.append(cell(row.importedAt ? new Intl.DateTimeFormat('pt-BR', { dateStyle:'short', timeStyle:'short' }).format(new Date(row.importedAt)) : '—'));
+          const action=cell(''); const remove=document.createElement('button'); remove.type='button'; remove.className='danger'; remove.dataset.removeId=row.id; remove.textContent='Excluir'; action.append(remove); tr.append(action); tbody.append(tr);
+        });
+        table.append(thead,tbody); wrap.append(table); body.append(wrap); section.append(summary,body); historyTable.append(section);
+      });
+    }
+    function aggregateOrders() {
+      const groups = new Map();
+      orders.forEach(row => {
+        const sku = value(row,'SKU') || 'Sem SKU';
+        if (!groups.has(sku)) groups.set(sku, { sku, asin:value(row,'ASIN'), title:value(row,'Item Title'), total:0, orders:0 });
+        const group=groups.get(sku); group.total += quantity(row); group.orders += 1;
+      });
+      return [...groups.values()].sort((a,b) => a.sku.localeCompare(b.sku, 'pt-BR'));
+    }
+    function renderPicking() {
+      const groups=aggregateOrders(); pickingTable.replaceChildren(); buttons.separacao.disabled = buttons.conferencia.disabled = buttons.etiquetas.disabled = groups.length === 0;
+      pickingStat.textContent = groups.length ? `${groups.length} SKU${groups.length === 1 ? '' : 's'} · ${qtyText(groups.reduce((sum,item) => sum + item.total, 0))} livro${groups.reduce((sum,item) => sum + item.total, 0) === 1 ? '' : 's'}` : 'Carregue um CSV';
+      if (!groups.length) { const empty=document.createElement('p'); empty.className='empty'; empty.textContent='Carregue um CSV na guia Romaneio para montar a lista de separação.'; pickingTable.append(empty); return; }
+      const wrap=document.createElement('div'); wrap.className='table-wrap'; const table=document.createElement('table');
+      const thead=document.createElement('thead'), headerRow=document.createElement('tr'); ['SKU','ASIN','Produto','Quantidade total','Pedidos'].forEach(label => { const th=document.createElement('th'); th.textContent=label; headerRow.append(th); }); thead.append(headerRow);
+      const tbody=document.createElement('tbody'); groups.forEach(item => { const tr=document.createElement('tr'); tr.append(cell(item.sku),cell(item.asin),cell(item.title),cell(qtyText(item.total),'qty'),cell(String(item.orders),'qty')); tbody.append(tr); }); table.append(thead,tbody); wrap.append(table); pickingTable.append(wrap);
+    }
+    function showTab(name) { tabButtons.forEach(button => button.classList.toggle('active', button.dataset.tab === name)); Object.entries(panels).forEach(([key,panel]) => panel.hidden = key !== name); }
+    async function copyOrderIds(day = null) {
+      const rows = day ? readHistory().filter(row => historyDate(row) === day) : readHistory();
+      const ids = [...new Set(rows.map(row => value(row,'Order ID')).filter(Boolean))];
+      if (!ids.length) return;
+      const text = ids.join(', ');
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(text);
+        else {
+          const area=document.createElement('textarea'); area.value=text; area.style.position='fixed'; area.style.opacity='0'; document.body.append(area); area.select(); document.execCommand('copy'); area.remove();
+        }
+        historyNotice(`${ids.length} Order ID${ids.length === 1 ? '' : 's'} ${day ? 'deste dia ' : ''}copiado${ids.length === 1 ? '' : 's'} separado${ids.length === 1 ? '' : 's'} por vírgula.`);
+      } catch { historyNotice('Não foi possível copiar automaticamente. Tente novamente ou use outro navegador.', true); }
+    }
+    function parseCsv(text) {
+      text = text.replace(/^\uFEFF/, '');
+      const firstLine = text.split(/\r?\n/, 1)[0] || '';
+      const delimiter = (firstLine.match(/;/g) || []).length > (firstLine.match(/,/g) || []).length ? ';' : ',';
+      const rows = []; let row = [], cell = '', quoted = false;
+      for (let i=0; i<text.length; i++) {
+        const ch = text[i], next = text[i+1];
+        if (ch === '"') { if (quoted && next === '"') { cell += '"'; i++; } else quoted = !quoted; }
+        else if (ch === delimiter && !quoted) { row.push(cell); cell=''; }
+        else if ((ch === '\n' || ch === '\r') && !quoted) { if (ch === '\r' && next === '\n') i++; row.push(cell); if (row.some(x => x !== '')) rows.push(row); row=[]; cell=''; }
+        else cell += ch;
+      }
+      if (cell !== '' || row.length) { row.push(cell); if (row.some(x => x !== '')) rows.push(row); }
+      if (!rows.length) throw new Error('O arquivo está vazio.');
+      const header = rows.shift().map(x => x.trim());
+      const missing = required.filter(x => !header.includes(x));
+      if (missing.length) throw new Error('Não encontrei as colunas: ' + missing.join(', ') + '. Verifique se este é o relatório de pedidos da Amazon.');
+      return rows.map(r => Object.fromEntries(header.map((h, i) => [h, (r[i] || '').trim()]))).filter(r => value(r, 'Order ID'));
+    }
+    async function receive(file) {
+      if (!file) return;
+      try {
+        orders = parseCsv(await file.text()); sourceName = file.name;
+        if (!orders.length) throw new Error('Não há pedidos no arquivo.');
+        buttons.editora.disabled = buttons.motorista.disabled = false;
+        renderPicking();
+        pendingOrders = orders;
+        saveDate.value = localDateKey();
+        savePromptText.textContent = `${orders.length} pedido${orders.length === 1 ? '' : 's'} do arquivo “${file.name}” foi${orders.length === 1 ? '' : 'ram'} carregado${orders.length === 1 ? '' : 's'}. Deseja salvar este lote no histórico de ${dateLabel(localDateKey())}?`;
+        savePrompt.hidden = false;
+        notice(`${orders.length} pedido${orders.length === 1 ? '' : 's'} carregado${orders.length === 1 ? '' : 's'} de “${file.name}”.`, 'ok');
+      } catch (error) {
+        orders = []; pendingOrders=[]; savePrompt.hidden=true; buttons.editora.disabled = buttons.motorista.disabled = buttons.separacao.disabled = true; renderPicking();
+        notice(error.message || 'Não foi possível ler o arquivo.', 'error');
+      }
+    }
+    input.addEventListener('change', () => receive(input.files[0]));
+    ['dragenter','dragover'].forEach(event => drop.addEventListener(event, e => { e.preventDefault(); drop.classList.add('drag'); }));
+    ['dragleave','drop'].forEach(event => drop.addEventListener(event, e => { e.preventDefault(); drop.classList.remove('drag'); }));
+    drop.addEventListener('drop', e => receive(e.dataTransfer.files[0]));
+    buttons.editora.addEventListener('click', () => download('editora'));
+    buttons.motorista.addEventListener('click', () => download('motorista'));
+    buttons.separacao.addEventListener('click', () => downloadPicking());
+    buttons.conferencia.addEventListener('click', () => downloadConference());
+    buttons.etiquetas.addEventListener('click', () => downloadLabels());
+    tabButtons.forEach(button => button.addEventListener('click', () => showTab(button.dataset.tab)));
+    historyTable.addEventListener('click', async event => {
+      const removeDay = event.target.closest('button[data-remove-day]');
+      if (removeDay) {
+        const day=removeDay.dataset.removeDay;
+        if (!window.confirm(`Excluir o dia ${dateLabel(day)}? Esta ação remove todos os pedidos salvos nessa data.`)) return;
+        try { await fetch(`/api/history/day/${day}`,{method:'DELETE'}); await loadHistory(); historyNotice(`Dia ${dateLabel(day)} excluído do diário.`); }
+        catch { historyNotice('Não foi possível excluir este dia.', true); }
+        return;
+      }
+      const copy = event.target.closest('button[data-copy-date]'); if (copy) { copyOrderIds(copy.dataset.copyDate); return; }
+      const button = event.target.closest('button[data-remove-id]'); if (!button) return;
+      try { await fetch(`/api/history/${button.dataset.removeId}`,{method:'DELETE'}); await loadHistory(); historyNotice('Pedido removido do histórico.'); }
+      catch { historyNotice('Não foi possível excluir este pedido.', true); }
+    });
+    buttons.copiar.addEventListener('click', copyOrderIds);
+    confirmSave.addEventListener('click', async () => {
+      try { const added=await addToHistory(pendingOrders, saveDate.value || localDateKey()); pendingOrders=[]; savePrompt.hidden=true;
+      historyNotice(added ? `${added} pedido${added === 1 ? '' : 's'} salvo${added === 1 ? '' : 's'} no histórico de hoje.` : 'Esses pedidos já estavam salvos no histórico.'); } catch { historyNotice('Não foi possível salvar no banco de dados.',true); }
+    });
+    skipSave.addEventListener('click', () => { pendingOrders=[]; savePrompt.hidden=true; historyNotice('Este lote não foi salvo no histórico.'); });
+    daySelector.addEventListener('change', () => { const day=daySelector.value; if(day){ orders=historyCache.filter(row=>historyDate(row)===day); sourceName=`Histórico de ${dateLabel(day)}`; buttons.editora.disabled=buttons.motorista.disabled=false; } renderPicking(); renderHistory(); });
+    todayButton.addEventListener('click', () => { daySelector.value=localDateKey(); daySelector.dispatchEvent(new Event('change')); });
+    daySelector.value = localDateKey();
+    loadHistory(); showNetworkAddress(); renderPicking();
+
+    function clean(text) {
+      const map = { '–':'-', '—':'-', '“':'"', '”':'"', '‘':"'", '’':"'", '…':'...', '•':'-', '€':'EUR', '™':'TM', '®':'(R)', '©':'(C)' };
+      return String(text ?? '').replace(/[–—“”‘’…•€™®©]/g, c => map[c] || '?').replace(/[\u0100-\uFFFF]/g, '?');
+    }
+    function esc(text) { return clean(text).replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)'); }
+    function wrap(text, chars) {
+      const words = clean(text).split(/\s+/); const lines=[]; let line='';
+      for (const word of words) { const next = line ? line + ' ' + word : word; if (next.length > chars && line) { lines.push(line); line=word; } else line=next; }
+      if (line || !lines.length) lines.push(line); return lines;
+    }
+    function today() { return new Intl.DateTimeFormat('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' }).format(new Date()); }
+    function pdfBytes(str) { const data = new Uint8Array(str.length); for (let i=0;i<str.length;i++) data[i] = str.charCodeAt(i) & 255; return data; }
+    function makePdf(copy) {
+      const W=841.89, H=595.28, left=25, right=25;
+      const columns = [
+        ['Pedido',78], ['SKU',82], ['ASIN',74], ['Produto',228], ['Qtd.',33], ['Rastreio',122], ['Transportadora',175]
+      ];
+      const x = [left]; columns.forEach(c => x.push(x[x.length-1] + c[1]));
+      const rows = orders.map((o, index) => {
+        const cells = [value(o,'Order ID'),value(o,'SKU'),value(o,'ASIN'),value(o,'Item Title'),value(o,'Item Quantity'),value(o,'Tracking ID'),value(o,'Ship Method')];
+        const lines = cells.map((c,i) => wrap(c, i===3 ? 46 : i===6 ? 24 : i===5 ? 19 : 14));
+        const maxLines = Math.max(...lines.map(a => a.length));
+        return { index:index+1, lines, height:Math.max(23, 10 + maxLines*9) };
+      });
+      const pages=[]; let page=[]; let used=105;
+      rows.forEach(row => { if (used + row.height > 510 && page.length) { pages.push(page); page=[]; used=105; } page.push(row); used += row.height; });
+      if (page.length || !pages.length) pages.push(page);
+      const streams = pages.map((page, pageIndex) => {
+        const isLast = pageIndex === pages.length-1; let s='';
+        // Each text block resets its fill to black. Without this, PDF graphics state
+        // inherited the pale-blue header fill and made the whole table unreadable.
+        const text = (size, xx, yy, content, bold=false) => { s += `0 g BT /F${bold ? '2' : '1'} ${size} Tf 1 0 0 1 ${xx.toFixed(2)} ${(H-yy).toFixed(2)} Tm (${esc(content)}) Tj ET\n`; };
+        const line = (x1,y1,x2,y2,width=.45) => { s += `${width} w ${x1.toFixed(2)} ${(H-y1).toFixed(2)} m ${x2.toFixed(2)} ${(H-y2).toFixed(2)} l S\n`; };
+        const rect = (xx,yy,w,h,fill) => { s += fill ? `${fill} rg ${xx} ${(H-yy-h).toFixed(2)} ${w} ${h} re f\n` : `${xx} ${(H-yy-h).toFixed(2)} ${w} ${h} re S\n`; };
+        text(16, left, 37, 'ROMANEIO DE RETIRADA — ' + (copy === 'editora' ? 'VIA DA EDITORA' : 'VIA DO MOTORISTA'), true);
+        text(8, left, 55, `Data de geração: ${today()}   |   Pedidos: ${orders.length}   |   Página ${pageIndex+1} de ${pages.length}`);
+        text(7.5, left, 70, 'Conferir os volumes e assinar no ato da retirada. Este documento refere-se ao relatório: ' + clean(sourceName).slice(0,85));
+        rect(left,84,W-left-right,18,'0.90 0.95 0.97');
+        columns.forEach((col,i) => text(8, x[i]+3, 96, col[0], true));
+        let y=102;
+        page.forEach(row => {
+          rect(left,y,W-left-right,row.height); x.slice(1,-1).forEach(xx => line(xx,y,xx,y+row.height));
+          row.lines.forEach((lines,i) => lines.slice(0,4).forEach((l,n) => text(7.8, x[i]+3, y+11+n*8.5, l)));
+          y += row.height;
+        });
+        line(left,84,W-right,84); line(left,y,W-right,y); x.forEach(xx => line(xx,84,xx,y));
+        if (isLast) {
+          const signer = copy === 'editora' ? 'Assinatura do retirante / motorista' : 'Assinatura da Editora Mizuno';
+          const confirmation = copy === 'editora' ? 'Confirmo o recebimento dos volumes relacionados acima.' : 'Confirmo a entrega dos volumes relacionados acima.';
+          const sy = 510;
+          text(8, left, sy, confirmation);
+          line(left,sy+31,left+300,sy+31,.7); text(7.5,left,sy+43,signer);
+          line(470,sy+31,W-right,sy+31,.7); text(7.5,470,sy+43,'Data e hora da retirada');
+          text(7,left,sy+58,'Nome legível: _______________________________________________   Documento: ______________________________');
+        }
+        return s;
+      });
+      return buildPdf(streams, W, H);
+    }
+    function buildPdf(streams, W, H) {
+      const pageCount=streams.length, font1=3+pageCount*2, font2=font1+1, objects=[];
+      objects[1] = '<< /Type /Catalog /Pages 2 0 R >>';
+      const kids=[]; for(let i=0;i<pageCount;i++) kids.push(`${3+i*2} 0 R`);
+      objects[2] = `<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${pageCount} >>`;
+      streams.forEach((stream,i) => { const p=3+i*2,c=p+1; objects[p]=`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 ${font1} 0 R /F2 ${font2} 0 R >> >> /Contents ${c} 0 R >>`; objects[c]=`<< /Length ${pdfBytes(stream).length} >>\nstream\n${stream}endstream`; });
+      objects[font1] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>';
+      objects[font2] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';
+      let body='%PDF-1.4\n%\xE2\xE3\xCF\xD3\n', offsets=[0];
+      for(let i=1;i<objects.length;i++) { offsets[i]=pdfBytes(body).length; body += `${i} 0 obj\n${objects[i]}\nendobj\n`; }
+      const start=pdfBytes(body).length; body += `xref\n0 ${objects.length}\n0000000000 65535 f \n`; for(let i=1;i<objects.length;i++) body += `${String(offsets[i]).padStart(10,'0')} 00000 n \n`; body += `trailer\n<< /Size ${objects.length} /Root 1 0 R >>\nstartxref\n${start}\n%%EOF`;
+      return new Blob([pdfBytes(body)], {type:'application/pdf'});
+    }
+    function makePickingPdf(conference=false) {
+      const items=aggregateOrders(), W=841.89, H=595.28, left=25, right=25;
+      const columns=conference ? [['SKU',125],['ASIN',95],['Produto',300],['Quantidade',105],['Conferido',166]] : [['SKU',142],['ASIN',105],['Produto',330],['Quantidade total',112],['Pedidos',102]];
+      const x=[left]; columns.forEach(column => x.push(x[x.length-1]+column[1]));
+      const rows=items.map(item => {
+        const lines=conference ? [wrap(item.sku,20),wrap(item.asin,15),wrap(item.title,55),[qtyText(item.total)],['________________']] : [wrap(item.sku,22),wrap(item.asin,16),wrap(item.title,64),[qtyText(item.total)],[String(item.orders)]];
+        return {lines,height:Math.max(25,10+Math.max(...lines.map(list => list.length))*9)};
+      });
+      const pages=[]; let page=[], used=108;
+      rows.forEach(row => { if (used+row.height>535 && page.length) { pages.push(page); page=[]; used=108; } page.push(row); used+=row.height; });
+      if (page.length || !pages.length) pages.push(page);
+      const totalBooks=items.reduce((sum,item)=>sum+item.total,0);
+      const streams=pages.map((page,index) => {
+        let s='';
+        const text=(size,xx,yy,content,bold=false) => { s+=`0 g BT /F${bold?'2':'1'} ${size} Tf 1 0 0 1 ${xx.toFixed(2)} ${(H-yy).toFixed(2)} Tm (${esc(content)}) Tj ET\n`; };
+        const line=(x1,y1,x2,y2,width=.45) => { s+=`${width} w ${x1.toFixed(2)} ${(H-y1).toFixed(2)} m ${x2.toFixed(2)} ${(H-y2).toFixed(2)} l S\n`; };
+        const rect=(xx,yy,w,h,fill) => { s+=fill?`${fill} rg ${xx} ${(H-yy-h).toFixed(2)} ${w} ${h} re f\n`:`${xx} ${(H-yy-h).toFixed(2)} ${w} ${h} re S\n`; };
+        text(17,left,38,conference ? 'LISTA DE CONFERÊNCIA — EDITORA MIZUNO' : 'LISTA DE SEPARAÇÃO — EDITORA MIZUNO',true);
+        text(8,left,57,`Data de geração: ${today()}   |   ${items.length} SKU${items.length===1?'':'s'}   |   ${qtyText(totalBooks)} livro${totalBooks===1?'':'s'}   |   Página ${index+1} de ${pages.length}`);
+        text(7.5,left,72,conference ? 'Marque a coluna Conferido após verificar fisicamente cada SKU.' : 'Separe a quantidade total de cada SKU antes da retirada.');
+        rect(left,86,W-left-right,18,'0.90 0.95 0.97'); columns.forEach((column,i)=>text(8,x[i]+3,98,column[0],true));
+        let y=104; page.forEach(row => { rect(left,y,W-left-right,row.height); x.slice(1,-1).forEach(xx=>line(xx,y,xx,y+row.height)); row.lines.forEach((lines,i)=>lines.slice(0,4).forEach((item,n)=>text(8,x[i]+3,y+11+n*8.5,item))); y+=row.height; });
+        line(left,86,W-right,86); line(left,y,W-right,y); x.forEach(xx=>line(xx,86,xx,y));
+        return s;
+      });
+      return buildPdf(streams,W,H);
+    }
+    function downloadBlob(blob, filename) {
+      const link=document.createElement('a'); link.href=URL.createObjectURL(blob); link.download=filename;
+      document.body.appendChild(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(link.href), 2000);
+    }
+    function download(copy) {
+      if (!orders.length) return;
+      const stamp=new Date().toISOString().slice(0,10);
+      downloadBlob(makePdf(copy), `romaneio_${copy === 'editora' ? 'via-editora' : 'via-motorista'}_${stamp}.pdf`);
+    }
+    function downloadPicking() {
+      if (!aggregateOrders().length) return;
+      downloadBlob(makePickingPdf(), `lista-separacao_${new Date().toISOString().slice(0,10)}.pdf`);
+    }
+    function downloadConference() { if (aggregateOrders().length) downloadBlob(makePickingPdf(true), `lista-conferencia_${new Date().toISOString().slice(0,10)}.pdf`); }
+    function downloadLabels() {
+      const grouped=[...orders.reduce((map,row)=>{const id=value(row,'Order ID'); if(!map.has(id)) map.set(id,[]); map.get(id).push(row); return map;},new Map()).values()];
+      const W=297.64,H=419.53, streams=[];
+      grouped.forEach(items=>{ let s=''; const text=(size,x,y,t,b=false)=>s+=`0 g BT /F${b?'2':'1'} ${size} Tf 1 0 0 1 ${x} ${(H-y).toFixed(2)} Tm (${esc(t)}) Tj ET\n`; const line=(x1,y1,x2,y2)=>s+=`.6 w ${x1} ${(H-y1).toFixed(2)} m ${x2} ${(H-y2).toFixed(2)} l S\n`; const x=16,y=16,track=value(items[0],'Tracking ID')||'SEM RASTREIO',tx=92,qx=247,right=281; text(9,x,y,'RASTREIO',true); text(18,x,y+21,track,true); text(10,x,y+49,`PEDIDO: ${value(items[0],'Order ID')}`,true); text(9,x,y+66,`TRANSPORTADORA: ${value(items[0],'Ship Method')}`); let yy=y+86; line(x,yy,right,yy); line(x,yy+19,right,yy+19); [x,tx,qx,right].forEach(xx=>line(xx,yy,xx,yy+19)); text(7,x+3,yy+13,'SKU'); text(10,tx+3,yy+13,'TÍTULO',true); text(9,qx+3,yy+13,'QTD',true); yy+=19; items.forEach(item=>{const title=wrap(value(item,'Item Title'),22).slice(0,4),h=Math.max(34,11+title.length*14); line(x,yy,right,yy); [x,tx,qx,right].forEach(xx=>line(xx,yy,xx,yy+h)); text(6.5,x+3,yy+15,value(item,'SKU')); title.forEach((t,n)=>text(12,tx+3,yy+16+n*14,t)); text(16,qx+7,yy+19,value(item,'Item Quantity'),true); yy+=h; line(x,yy,right,yy);}); streams.push(s); });
+      downloadBlob(buildPdf(streams,W,H),`etiquetas-a6_${new Date().toISOString().slice(0,10)}.pdf`);
+    }
+  })();
+  </script>
+</body>
+</html>

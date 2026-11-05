@@ -1,0 +1,9 @@
+services:
+  romaneio:
+    build: .
+    container_name: sistema-romaneio-amazon
+    restart: unless-stopped
+    ports:
+      - "8765:8765"
+    volumes:
+      - ./data:/app/data
