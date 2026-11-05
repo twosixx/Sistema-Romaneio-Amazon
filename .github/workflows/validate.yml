@@ -1,0 +1,17 @@
+name: Validar Romaneio
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validar Python
+        run: python3 -m py_compile server.py
+      - name: Validar Docker
+        run: docker build -t sistema-romaneio-amazon:check .

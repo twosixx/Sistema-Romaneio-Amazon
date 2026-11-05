@@ -1,0 +1,9 @@
+services:
+  romaneio:
+    image: ghcr.io/twosixx/sistema-romaneio-amazon:v1.0.0
+    container_name: sistema-romaneio-amazon
+    restart: unless-stopped
+    ports:
+      - "8765:8765"
+    volumes:
+      - /volume3/docker/romaneio/data:/app/data
